@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic New Year 2026</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Global Styles & Animations -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050510;
+            overflow-x: hidden;
+        }
+
+        /* Animations */
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+        .animate-shine {
+            animation: shine 3s infinite linear;
+        }
+        
+        @keyframes loading-bar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        .animate-loading-bar {
+            animation: loading-bar 2.5s ease-out forwards;
+        }
+
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.02); }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 4s infinite ease-in-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-scaleIn {
+            animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0); }
+            10%, 30%, 50%, 70%, 90% { transform: translate(-5px, 0); }
+            20%, 40%, 60%, 80% { transform: translate(5px, 0); }
+        }
+        .animate-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* Selection Color */
+        ::selection {
+            background-color: #06b6d4; /* cyan-500 */
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- Icon Components (Inline SVGs) ---
+        const IconBase = ({ children, className }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="24" height="24" viewBox="0 0 24 24" 
+                fill="none" stroke="currentColor" strokeWidth="2" 
+                strokeLinecap="round" strokeLinejoin="round" 
+                className={className}
+            >
+                {children}
+            </svg>
+        );
+
+        const Sparkles = ({ className, size }) => (
+            <IconBase className={className} width={size} height={size}>
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                <path d="M5 3v4"/>
+                <path d="M9 5H5"/>
+            </IconBase>
+        );
+
+        const Send = ({ className }) => (
+            <IconBase className={className}>
+                <path d="m22 2-7 20-4-9-9-4Z"/>
+                <path d="M22 2 11 13"/>
+            </IconBase>
+        );
+
+        const Share2 = ({ className }) => (
+            <IconBase className={className}>
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/>
+                <line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/>
+            </IconBase>
+        );
+
+        const RefreshCw = ({ className }) => (
+            <IconBase className={className}>
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                <path d="M8 16H3v5"/>
+            </IconBase>
+        );
+
+        const Star = ({ className, size }) => (
+            <IconBase className={className} width={size} height={size}>
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </IconBase>
+        );
+
+        const Rocket = ({ className }) => (
+            <IconBase className={className}>
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+            </IconBase>
+        );
+
+        const Music = ({ className }) => (
+            <IconBase className={className}>
+                <path d="M9 18V5l12-2v13"/>
+                <circle cx="6" cy="18" r="3"/>
+                <circle cx="18" cy="16" r="3"/>
+            </IconBase>
+        );
+
+        const Zap = ({ className, size }) => (
+            <IconBase className={className} width={size} height={size}>
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </IconBase>
+        );
+
+        // --- Constants & Assets ---
+        // Combined list of 4 wishes
+        const FINAL_WISHES = [
+            "🌟 Progress today, success tomorrow. 💫",
+            "✨ Dream. Build. Succeed. 🚀",
+            "💡 Think smart. Grow fast. 📈",
+            "🚀 Stay focused. Stay winning. 🔥"
+        ];
+
+        // --- Helper Components ---
+
+        const Button = ({ children, onClick, className = "", icon: Icon, disabled }) => (
+            <button
+                onClick={onClick}
+                disabled={disabled}
+                className={`group relative flex items-center justify-center gap-2 px-8 py-4 bg-transparent overflow-hidden rounded-full transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+            >
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 opacity-80 group-hover:opacity-100 transition-opacity blur-sm"></div>
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 opacity-100"></div>
+                
+                <span className="relative z-10 font-bold text-white tracking-wider uppercase text-sm flex items-center gap-2">
+                {children}
+                {Icon && <Icon className="w-4 h-4 transition-transform group-hover:rotate-12" />}
+                </span>
+                
+                {/* Shine effect */}
+                <div className="absolute top-0 -inset-full h-full w-1/2 z-10 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-40 group-hover:animate-shine" />
+            </button>
+        );
+
+        // --- Countdown Component ---
+        const Countdown = () => {
+            const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+            useEffect(() => {
+                const calculateTimeLeft = () => {
+                // Set target to Jan 1, 2026
+                const targetDate = new Date("2026-01-01T00:00:00").getTime();
+                const now = new Date().getTime();
+                const difference = targetDate - now;
+
+                if (difference > 0) {
+                    setTimeLeft({
+                    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                    minutes: Math.floor((difference / 1000 / 60) % 60),
+                    seconds: Math.floor((difference / 1000) % 60),
+                    });
+                } else {
+                    setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+                }
+                };
+
+                const timer = setInterval(calculateTimeLeft, 1000);
+                calculateTimeLeft(); // Initial call
+
+                return () => clearInterval(timer);
+            }, []);
+
+            const timeUnits = [
+                { label: 'DAYS', value: timeLeft.days },
+                { label: 'HRS', value: timeLeft.hours },
+                { label: 'MINS', value: timeLeft.minutes },
+                { label: 'SECS', value: timeLeft.seconds },
+            ];
+
+            return (
+                <div className="w-full mt-6 mb-8">
+                <div className="text-center mb-3">
+                    <span className="text-xs uppercase tracking-[0.3em] text-cyan-400 font-bold animate-pulse">Time Until Launch</span>
+                </div>
+                <div className="grid grid-cols-4 gap-2 md:gap-4 p-4 bg-black/40 rounded-2xl border border-cyan-500/20 backdrop-blur-md shadow-[0_0_20px_rgba(0,255,255,0.1)]">
+                    {timeUnits.map(({ label, value }, index) => (
+                    <div key={label} className="flex flex-col items-center relative group">
+                        <div className="relative">
+                            <span className="text-2xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-cyan-200 to-blue-500 font-mono tracking-tighter group-hover:scale-110 transition-transform duration-300">
+                            {String(value).padStart(2, '0')}
+                            </span>
+                            {/* Subtle reflection */}
+                            <span className="absolute top-full left-0 w-full text-2xl md:text-4xl font-black text-cyan-500/10 font-mono tracking-tighter transform -scale-y-100 blur-[2px] pointer-events-none">
+                            {String(value).padStart(2, '0')}
+                            </span>
+                        </div>
+                        <span className="text-[9px] md:text-[10px] text-blue-300/80 tracking-widest font-bold mt-2 border-t border-white/10 w-full text-center pt-1">
+                        {label}
+                        </span>
+                        {/* Divider */}
+                        {index < 3 && (
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[50%] md:translate-x-[100%] w-px h-8 bg-gradient-to-b from-transparent via-cyan-500/30 to-transparent"></div>
+                        )}
+                    </div>
+                    ))}
+                </div>
+                </div>
+            );
+        };
+
+        // --- Canvas Background Component ---
+        const Starfield = ({ speed }) => {
+            const canvasRef = useRef(null);
+
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                let width = window.innerWidth;
+                let height = window.innerHeight;
+                
+                const resize = () => {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                };
+                window.addEventListener('resize', resize);
+                resize();
+
+                const stars = Array.from({ length: 400 }, () => ({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                z: Math.random() * width, // depth
+                size: Math.random() * 2,
+                }));
+
+                let animationFrameId;
+
+                const render = () => {
+                // Clear with trail effect
+                ctx.fillStyle = 'rgba(10, 10, 20, 0.4)'; 
+                ctx.fillRect(0, 0, width, height);
+                
+                const cx = width / 2;
+                const cy = height / 2;
+
+                stars.forEach(star => {
+                    // Move star towards screen (z decreases)
+                    star.z -= speed;
+                    
+                    // Reset if passed screen
+                    if (star.z <= 0) {
+                    star.z = width;
+                    star.x = Math.random() * width;
+                    star.y = Math.random() * height;
+                    }
+
+                    // Project 3D to 2D
+                    const x = (star.x - cx) * (width / star.z) + cx;
+                    const y = (star.y - cy) * (width / star.z) + cy;
+                    const s = star.size * (width / star.z);
+
+                    // Draw star
+                    const alpha = 1 - (star.z / width); // Fade distant stars
+                    ctx.beginPath();
+                    ctx.arc(x, y, s > 0 ? s : 0, 0, 2 * Math.PI);
+                    ctx.fillStyle = `rgba(200, 230, 255, ${alpha})`;
+                    ctx.fill();
+                    
+                    // Add glow to close stars
+                    if (alpha > 0.8) {
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = 'white';
+                    } else {
+                        ctx.shadowBlur = 0;
+                    }
+                });
+
+                animationFrameId = requestAnimationFrame(render);
+                };
+
+                render();
+
+                return () => {
+                window.removeEventListener('resize', resize);
+                cancelAnimationFrame(animationFrameId);
+                };
+            }, [speed]);
+
+            return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />;
+        };
+
+        // --- Fireworks Effect Component ---
+        const Fireworks = ({ active }) => {
+            const canvasRef = useRef(null);
+
+            useEffect(() => {
+                if (!active) return;
+
+                // Haptic feedback on fireworks start
+                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+                
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                let width = window.innerWidth;
+                let height = window.innerHeight;
+                
+                canvas.width = width;
+                canvas.height = height;
+
+                class Particle {
+                constructor(x, y, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.color = color;
+                    const angle = Math.random() * Math.PI * 2;
+                    const velocity = Math.random() * 6 + 2;
+                    this.vx = Math.cos(angle) * velocity;
+                    this.vy = Math.sin(angle) * velocity;
+                    this.alpha = 1;
+                    this.decay = Math.random() * 0.015 + 0.01;
+                    this.gravity = 0.05;
+                }
+                
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.vy += this.gravity;
+                    this.alpha -= this.decay;
+                    return this.alpha > 0;
+                }
+                
+                draw(ctx) {
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+                }
+
+                let particles = [];
+                
+                const createFirework = () => {
+                    const x = Math.random() * width;
+                    const y = Math.random() * (height / 2);
+                    // Added White (#FFFFFF) and Deep Pink (#FF1493) for "Real Light" effect
+                    const colors = ['#FF00FF', '#00FFFF', '#FFD700', '#FF4500', '#7FFF00', '#FFFFFF', '#FF1493'];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    for (let i = 0; i < 50; i++) {
+                        particles.push(new Particle(x, y, color));
+                    }
+                };
+
+                // Launch fireworks periodically
+                const interval = setInterval(createFirework, 800);
+                // Initial burst
+                createFirework();
+                createFirework();
+
+                let animationId;
+                const loop = () => {
+                    ctx.clearRect(0, 0, width, height); // Fully clear for crisp fireworks
+                    particles = particles.filter(p => p.update());
+                    particles.forEach(p => p.draw(ctx));
+                    animationId = requestAnimationFrame(loop);
+                };
+                loop();
+
+                return () => {
+                    clearInterval(interval);
+                    cancelAnimationFrame(animationId);
+                };
+            }, [active]);
+
+            if (!active) return null;
+            return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-10" />;
+        };
+
+        // --- Main Application ---
+        function App() {
+            const [phase, setPhase] = useState('input'); // input, transitioning, result
+            const [name, setName] = useState('');
+            const [bgSpeed, setBgSpeed] = useState(2);
+            const [shake, setShake] = useState(false);
+            
+            // State to track which wishes are visible
+            const [visibleWishes, setVisibleWishes] = useState([]);
+            
+            // Sequential text logic
+            useEffect(() => {
+                if (phase === 'result') {
+                    // Start with the first wish
+                    setVisibleWishes([FINAL_WISHES[0]]);
+                    
+                    let currentIndex = 1;
+                    const interval = setInterval(() => {
+                        if (currentIndex < FINAL_WISHES.length) {
+                            // Add the next wish to the array
+                            setVisibleWishes(prev => [...prev, FINAL_WISHES[currentIndex]]);
+                            currentIndex++;
+                        } else {
+                            clearInterval(interval);
+                        }
+                    }, 2000); // 2 Second Interval
+                    
+                    return () => clearInterval(interval);
+                } else {
+                    setVisibleWishes([]);
+                }
+            }, [phase]);
+
+            // Custom cursor logic
+            const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+            useEffect(() => {
+                const moveCursor = (e) => {
+                    setCursorPos({ x: e.clientX, y: e.clientY });
+                };
+                window.addEventListener('mousemove', moveCursor);
+                return () => window.removeEventListener('mousemove', moveCursor);
+            }, []);
+
+            const handleGenerate = (e) => {
+                e.preventDefault();
+                if (!name.trim()) return;
+
+                // Haptic feedback for "Real Vibe"
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                setShake(true);
+
+                // Start transition
+                setPhase('transitioning');
+                setBgSpeed(40); // Warp speed!
+                
+                // Delay for effect
+                setTimeout(() => {
+                    setPhase('result');
+                    setBgSpeed(0.5); // Slow down for peaceful view
+                    setShake(false);
+                    if (navigator.vibrate) navigator.vibrate(200); // Success vibe
+                }, 2500);
+            };
+
+            const handleReset = () => {
+                setPhase('input');
+                setName('');
+                setBgSpeed(2);
+                setVisibleWishes([]); // Reset wishes
+            };
+            
+            const handleCopy = () => {
+                const text = `Happy New Year! ${name} \n${FINAL_WISHES.join('\n')}`;
+                // Fallback copy method
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                } catch (err) {
+                    console.error('Unable to copy', err);
+                }
+                document.body.removeChild(textArea);
+            };
+
+            return (
+                <div className="min-h-screen text-white font-sans overflow-hidden relative">
+                
+                {/* Background Music/Sound Control (Visual Only for this demo) */}
+                <div className="absolute top-6 right-6 z-50 animate-pulse">
+                    <Music className="w-6 h-6 text-cyan-400 opacity-50" />
+                </div>
+
+                {/* Dynamic Backgrounds */}
+                <Starfield speed={bgSpeed} />
+                <Fireworks active={phase === 'result'} />
+                
+                {/* Custom Glow Cursor */}
+                <div 
+                    className="fixed w-64 h-64 bg-cyan-500 rounded-full blur-[100px] pointer-events-none opacity-20 z-0 mix-blend-screen transition-transform duration-100 ease-out"
+                    style={{ 
+                        left: cursorPos.x - 128, 
+                        top: cursorPos.y - 128 
+                    }}
+                />
+
+                {/* Credit to Vishal */}
+                <div className="fixed bottom-6 left-0 right-0 z-30 text-center">
+                    <div className="inline-block group cursor-default">
+                        <span className="text-[10px] md:text-xs text-white/30 tracking-[0.3em] uppercase group-hover:text-cyan-400 transition-colors duration-300">
+                            Created & Designed by
+                        </span>
+                        <div className="text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 font-bold tracking-widest mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                            VISHU
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main Content Container with Shake Effect */}
+                <main className={`relative z-20 min-h-screen flex flex-col items-center justify-center p-4 ${shake ? 'animate-shake' : ''}`}>
+                    
+                    {/* LOGO */}
+                    <div className={`transition-all duration-1000 transform ${phase === 'input' ? 'translate-y-0 opacity-100' : '-translate-y-20 opacity-0 pointer-events-none absolute'}`}>
+                        <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-cyan-200 to-blue-500 tracking-tighter drop-shadow-[0_0_15px_rgba(0,255,255,0.5)] mb-4 text-center">
+                        2026
+                        </h1>
+                        <p className="text-center text-blue-200 tracking-[0.5em] text-sm md:text-base uppercase font-light">
+                            New Year Gateway
+                        </p>
+                    </div>
+
+                    {/* PHASE 1: INPUT */}
+                    {phase === 'input' && (
+                    <div className="w-full max-w-md mt-12 animate-fadeInUp">
+                        <div className="backdrop-blur-xl bg-white/5 border border-white/10 p-8 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.5)] transform hover:scale-[1.02] transition-transform duration-500">
+                            <form onSubmit={handleGenerate} className="flex flex-col gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs uppercase tracking-widest text-cyan-300 ml-1">Enter Your Name</label>
+                                    <input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        placeholder="Traveler Name..."
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl px-6 py-4 text-lg focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-white/20"
+                                        autoFocus
+                                    />
+                                </div>
+                                <Button 
+                                    disabled={!name.trim()} 
+                                    icon={Rocket}
+                                >
+                                    Launch Wish
+                                </Button>
+                            </form>
+                        </div>
+                        
+                        <div className="mt-8 flex justify-center gap-4 opacity-50 text-xs text-blue-300">
+                            <span className="flex items-center gap-1"><Sparkles size={12}/> AI Powered</span>
+                            <span className="flex items-center gap-1"><Star size={12}/> Cosmic Theme</span>
+                        </div>
+                    </div>
+                    )}
+
+                    {/* PHASE 2: TRANSITION */}
+                    {phase === 'transitioning' && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 backdrop-blur-[2px] z-50">
+                            <div className="text-4xl md:text-6xl font-black text-white tracking-widest animate-pulse drop-shadow-[0_0_30px_rgba(0,255,255,0.8)]">
+                                ENTERING 2026
+                            </div>
+                            <div className="mt-8 w-64 h-1 bg-gray-800 rounded-full overflow-hidden">
+                                <div className="h-full bg-cyan-400 animate-loading-bar box-shadow-[0_0_20px_cyan]"></div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* PHASE 3: RESULT */}
+                    {phase === 'result' && (
+                    <div className="w-full max-w-3xl perspective-1000 animate-scaleIn mb-12">
+                        {/* 3D Tilt Card Container */}
+                        <div className="relative group transform-style-3d hover:rotate-x-1 hover:rotate-y-1 transition-transform duration-500">
+                            
+                            {/* Glow behind card */}
+                            <div className="absolute -inset-4 bg-gradient-to-r from-cyan-600 to-purple-600 rounded-[2.5rem] blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-500 animate-pulse-slow"></div>
+                            
+                            {/* The Card */}
+                            <div className="relative bg-[#0a0a16]/95 backdrop-blur-xl border border-cyan-500/30 rounded-[2rem] p-6 md:p-10 text-center overflow-hidden shadow-[0_0_50px_rgba(0,255,255,0.2)]">
+                                
+                                {/* Decorative Elements */}
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50"></div>
+                                <div className="absolute -top-24 -right-24 w-48 h-48 bg-purple-500 rounded-full blur-[80px] opacity-20"></div>
+                                <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-cyan-500 rounded-full blur-[80px] opacity-20"></div>
+
+                                {/* Content */}
+                                <div className="relative z-10 space-y-6">
+                                    <div>
+                                        <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-xs tracking-[0.2em] text-cyan-300 mb-6 uppercase shadow-[0_0_10px_rgba(0,255,255,0.2)]">
+                                            <Zap size={12} className="text-yellow-400" /> Transmission Incoming
+                                        </div>
+                                        
+                                        {/* Structure Change: 4 Lines as requested */}
+                                        
+                                        {/* Line 1: Happy New Year Dear */}
+                                        <h3 className="text-2xl md:text-4xl font-bold text-white mb-2 font-serif tracking-widest uppercase drop-shadow-md">
+                                            Happy New Year Dear
+                                        </h3>
+
+                                        {/* Line 2: Name */}
+                                        <h1 className="text-5xl md:text-7xl font-black mb-4 font-serif tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-purple-400 drop-shadow-[0_0_15px_rgba(0,255,255,0.5)]">
+                                            {name}
+                                        </h1>
+
+                                        {/* Line 4: Stacked Wishes with Animation */}
+                                        <div className="w-full h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent my-4"></div>
+
+                                        <div className="flex flex-col items-center justify-center space-y-3 min-h-[14rem]">
+                                            {visibleWishes.map((wish, index) => (
+                                                <p 
+                                                    key={index}
+                                                    className="text-lg md:text-2xl font-bold leading-relaxed tracking-wide drop-shadow-md text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-400 animate-fadeInUp"
+                                                >
+                                                    "{wish}"
+                                                </p>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="w-full h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+                                    
+                                    {/* COUNTDOWN SECTION */}
+                                    <Countdown />
+
+                                    <div className="flex flex-col md:flex-row items-center justify-center gap-4 pt-2">
+                                        <Button onClick={handleCopy} icon={Share2} className="w-full md:w-auto">
+                                            Share Wish
+                                        </Button>
+                                        <button 
+                                            onClick={handleReset}
+                                            className="px-8 py-4 rounded-full border border-white/10 hover:bg-white/5 transition-colors text-sm font-bold tracking-wider uppercase flex items-center gap-2 text-gray-400 hover:text-white"
+                                        >
+                                            <RefreshCw className="w-4 h-4" />
+                                            Replay
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="text-center mt-8 text-white/30 text-sm">
+                            Touch the stars to celebrate • 2026
+                        </div>
+                    </div>
+                    )}
+
+                </main>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
